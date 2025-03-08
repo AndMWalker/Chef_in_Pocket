@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chef in Pocket</title>
+  <!-- Include Marked.js to convert Markdown to HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /*
+      Requested color scheme changes:
+      1) Header: #730f82 (purple) with white text, bigger font
+      2) Body: #96c332 (green)
+      3) No "left/right panel" backgrounds; keep it green behind them
+      4) Buttons: purple (#730f82) with white text
+      5) All text boxes: white (#ffffff) with black (#000000) text
+         Text on green = black, text on purple = white
+    */
+
+    /* Overall page styling */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #96c332; /* green body */
+      color: #000000; /* black text on green background */
+    }
+
+    header {
+      background-color: #730f82; /* purple header */
+      color: #ffffff; /* white text on purple */
+      text-align: center;
+      padding: 20px;
+      font-size: 2.5em; /* bigger font size */
+    }
+
+    /* Container with two columns but no special background */
+    .container {
+      display: flex;
+      padding: 20px;
+    }
+
+    .left, .right {
+      flex: 1;
+      padding: 20px;
+      margin: 5px;
+      /* No special background or border so the green body shows through */
+    }
+
+    /* Form styling */
+    form label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    form input[type="text"],
+    form input[type="number"],
+    form select {
+      width: 90%;
+      padding: 8px;
+      margin: 5px 0;
+      box-sizing: border-box;
+      border: 1px solid #000000; /* simple black border for clarity */
+      border-radius: 4px;
+      background-color: #ffffff; /* white text box */
+      color: #000000;           /* black text inside the input */
+    }
+
+    /* Suggestion button styles */
+    .suggestion-btn {
+      margin-left: 5px;
+      padding: 4px 8px;
+      font-size: 0.9em;
+      cursor: pointer;
+      background-color: #730f82; /* purple button */
+      color: #ffffff;            /* white text */
+      border: none;
+      border-radius: 4px;
+    }
+
+    .suggestions {
+      margin: 5px 0 10px 0;
+      display: none;
+    }
+
+    .suggestion-item {
+      display: inline-block;
+      margin: 3px;
+      padding: 4px 8px;
+      background-color: #730f82; /* purple item */
+      color: #ffffff;            /* white text on purple */
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Set plans section */
+    .set-plans {
+      margin-top: 30px;
+    }
+
+    .set-plans button {
+      margin: 5px;
+      padding: 8px 12px;
+      background-color: #730f82; /* purple button */
+      color: #ffffff;            /* white text */
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Generate button style */
+    #generateBtn {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 1.1em;
+      background-color: #730f82; /* purple button */
+      color: #ffffff;            /* white text */
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Loading spinner */
+    #loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .spinner {
+      margin: auto;
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #730f82; /* purple spinner top */
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Right column heading */
+    .right h2 {
+      text-align: center;
+    }
+
+    /* Results area (output) => white box, black text */
+    #results {
+      margin-top: 20px;
+      background: #ffffff;  /* white background */
+      color: #000000;       /* black text */
+      padding: 15px;
+      border-radius: 6px;
+      min-height: 150px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    /* Styling for rendered markdown inside #results */
+    #results h1 {
+      font-size: 2em;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #730f82; /* headings in the results can be purple for emphasis */
+    }
+
+    #results table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+      background-color: #ffffff; /* keep table white */
+      color: #000000;           /* black text inside table */
+    }
+
+    #results table, #results th, #results td {
+      border: 1px solid #000000; /* black border for cells */
+    }
+
+    #results th, #results td {
+      padding: 8px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    #results hr {
+      border: 1px solid #000000; /* black horizontal rule in results */
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>Chef in Pocket</header>
+  <div class="container">
+    <div class="left">
+      <form id="nutritionForm">
+        <!-- Ingredients Input with Suggestions -->
+        <label for="ingredients">Ingredients Available:</label>
+        <input type="text" id="ingredients" name="ingredients" />
+        <button type="button" class="suggestion-btn" onclick="toggleSuggestions('ingredients-suggestions')">Suggestions</button>
+        <div id="ingredients-suggestions" class="suggestions">
+          <span class="suggestion-item" onclick="addSuggestion('ingredients', 'Chicken')">Chicken</span>
+          <span class="suggestion-item" onclick="addSuggestion('ingredients', 'Tomatoes')">Tomatoes</span>
+          <span class="suggestion-item" onclick="addSuggestion('ingredients', 'Broccoli')">Broccoli</span>
+          <span class="suggestion-item" onclick="addSuggestion('ingredients', 'Tofu')">Tofu</span>
+        </div>
+
+        <!-- Dietary or Cuisine Preferences Input with Suggestions -->
+        <label for="dietary_preferences">Dietary or Cuisine Preferences:</label>
+        <input type="text" id="dietary_preferences" name="dietary_preferences" />
+        <button type="button" class="suggestion-btn" onclick="toggleSuggestions('dietary-suggestions')">Suggestions</button>
+        <div id="dietary-suggestions" class="suggestions">
+          <!-- Dietary preferences -->
+          <span class="suggestion-item" onclick="addSuggestion('dietary_preferences', 'Vegetarian')">Vegetarian</span>
+          <span class="suggestion-item" onclick="addSuggestion('dietary_preferences', 'Vegan')">Vegan</span>
+          <span class="suggestion-item" onclick="addSuggestion('dietary_preferences', 'Gluten-Free')">Gluten-Free</span>
+          <span class="suggestion-item" onclick="addSuggestion('dietary_preferences', 'High Protein')">High Protein</span>
+          <!-- Cuisine preferences -->
+          <span class="suggestion-item" onclick="addSuggestion('dietary_preferences', 'Chinese Cuisine')">Chinese Cuisine</span>
+          <span class="suggestion-item" onclick="addSuggestion('dietary_preferences', 'Indian Cuisine')">Indian Cuisine</span>
+          <span class="suggestion-item" onclick="addSuggestion('dietary_preferences', 'Italian Cuisine')">Italian Cuisine</span>
+        </div>
+
+        <!-- Caloric Target Dropdown -->
+        <label for="caloric_target">Caloric Target:</label>
+        <select id="caloric_target" name="caloric_target">
+          <option value="No preference" selected>No preference</option>
+          <option value="Lower calories">Lower calories</option>
+          <option value="Higher calories">Higher calories</option>
+        </select>
+
+        <!-- Meal Time Dropdown -->
+        <label for="meal_time">Meal Time:</label>
+        <select id="meal_time" name="meal_time">
+          <option value="No preference" selected>No preference</option>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Lunch">Lunch</option>
+          <option value="Dinner">Dinner</option>
+          <option value="Dessert">Dessert</option>
+          <option value="Snack">Snack</option>
+        </select>
+
+        <!-- Cooking Experience Dropdown -->
+        <label for="cooking_experience">Cooking Experience:</label>
+        <select id="cooking_experience" name="cooking_experience">
+          <option value="No preference" selected>No preference</option>
+          <option value="Little">Little</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Experienced">Experienced</option>
+        </select>
+
+        <!-- Quick Meals Checkbox -->
+        <label>
+          <input type="checkbox" id="quick_meals" name="quick_meals" />
+          Quick meals only
+        </label>
+
+        <!-- Health Conditions Input with Suggestions -->
+        <label for="health_conditions">Health Conditions:</label>
+        <input type="text" id="health_conditions" name="health_conditions" />
+        <button type="button" class="suggestion-btn" onclick="toggleSuggestions('health-suggestions')">Suggestions</button>
+        <div id="health-suggestions" class="suggestions">
+          <span class="suggestion-item" onclick="addSuggestion('health_conditions', 'Diabetes')">Diabetes</span>
+          <span class="suggestion-item" onclick="addSuggestion('health_conditions', 'Gluten intolerance')">Gluten intolerance</span>
+          <span class="suggestion-item" onclick="addSuggestion('health_conditions', 'High Blood Pressure')">High Blood Pressure</span>
+          <span class="suggestion-item" onclick="addSuggestion('health_conditions', 'None')">None</span>
+        </div>
+
+        <br/>
+        <button type="button" id="generateBtn">Generate Recipes</button>
+      </form>
+
+      <!-- Set Plans Section -->
+      <div class="set-plans">
+        <h3>Set Plans</h3>
+        <button type="button" onclick="applySetPlan('vegetarian')">Vegetarian Delight</button>
+        <button type="button" onclick="applySetPlan('highProtein')">High Protein, Low Carb</button>
+        <button type="button" onclick="applySetPlan('balanced')">Balanced Meal</button>
+      </div>
+    </div>
+
+    <div class="right">
+      <h2>Results</h2>
+      <div id="loading">
+        <div class="spinner"></div>
+        <p>Hold on, let me cook</p>
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle display of suggestion list
+    function toggleSuggestions(id) {
+      const element = document.getElementById(id);
+      element.style.display = (element.style.display === 'none' || element.style.display === '') ? 'block' : 'none';
+    }
+
+    // Append suggestion to input (prepend with comma if text already exists)
+    function addSuggestion(inputId, suggestion) {
+      const inputElement = document.getElementById(inputId);
+      let currentVal = inputElement.value.trim();
+      if (currentVal) {
+        inputElement.value = suggestion + ", " + currentVal;
+      } else {
+        inputElement.value = suggestion;
+      }
+    }
+
+    // Predefined set plans
+    function applySetPlan(plan) {
+      if (plan === 'vegetarian') {
+        addSuggestion('ingredients', 'Tofu, Spinach, Quinoa');
+        addSuggestion('dietary_preferences', 'Vegetarian');
+        document.getElementById('caloric_target').value = "No preference";
+      } else if (plan === 'highProtein') {
+        addSuggestion('ingredients', 'Chicken, Broccoli, Almonds');
+        addSuggestion('dietary_preferences', 'High Protein, Low Carb');
+        document.getElementById('caloric_target').value = "Lower calories";
+      } else if (plan === 'balanced') {
+        addSuggestion('ingredients', 'Salmon, Brown Rice, Mixed Vegetables');
+        addSuggestion('dietary_preferences', 'Balanced');
+        document.getElementById('caloric_target').value = "Higher calories";
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      // Show loading spinner and message
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('results').innerHTML = '';
+
+      // Gather user input values
+      const ingredients = document.getElementById('ingredients').value;
+      const dietary_preferences = document.getElementById('dietary_preferences').value;
+      const caloric_target = document.getElementById('caloric_target').value;
+      const meal_time = document.getElementById('meal_time').value;
+      const cooking_experience = document.getElementById('cooking_experience').value;
+      const quick_meals = document.getElementById('quick_meals').checked;
+      const health_conditions = document.getElementById('health_conditions').value;
+
+      // Create request body
+      const requestBody = {
+        ingredients,
+        dietary_preferences,
+        caloric_target,
+        meal_time,
+        cooking_experience,
+        quick_meals,
+        health_conditions
+      };
+
+      try {
+        // Make a POST request to our Flask endpoint
+        const response = await fetch('/generate_recipes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          throw new Error('Error: ' + response.status);
+        }
+
+        const data = await response.json();
+        // Convert the Markdown response to HTML using Marked.js
+        document.getElementById('results').innerHTML = marked.parse(data.recipes || data.error);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('results').innerHTML = 'An error occurred: ' + err.message;
+      } finally {
+        // Hide loading spinner after completion
+        document.getElementById('loading').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
+
+
