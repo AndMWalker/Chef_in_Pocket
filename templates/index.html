@@ -6,34 +6,24 @@
   <!-- Include Marked.js to convert Markdown to HTML -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    /*
-      Requested color scheme changes:
-      1) Header: #730f82 (purple) with white text, bigger font
-      2) Body: #96c332 (green)
-      3) No "left/right panel" backgrounds; keep it green behind them
-      4) Buttons: purple (#730f82) with white text
-      5) All text boxes: white (#ffffff) with black (#000000) text
-         Text on green = black, text on purple = white
-    */
 
-    /* Overall page styling */
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background-color: #96c332; /* green body */
-      color: #000000; /* black text on green background */
+      background-color: #96c332; 
+      color: #000000; 
     }
 
     header {
-      background-color: #730f82; /* purple header */
-      color: #ffffff; /* white text on purple */
+      background-color: #730f82; 
+      color: #ffffff; 
       text-align: center;
       padding: 20px;
-      font-size: 2.5em; /* bigger font size */
+      font-size: 2.5em; 
     }
 
-    /* Container with two columns but no special background */
+   
     .container {
       display: flex;
       padding: 20px;
@@ -43,10 +33,10 @@
       flex: 1;
       padding: 20px;
       margin: 5px;
-      /* No special background or border so the green body shows through */
+      
     }
 
-    /* Form styling */
+   
     form label {
       display: block;
       margin-top: 15px;
@@ -60,20 +50,20 @@
       padding: 8px;
       margin: 5px 0;
       box-sizing: border-box;
-      border: 1px solid #000000; /* simple black border for clarity */
+      border: 1px solid #000000; 
       border-radius: 4px;
-      background-color: #ffffff; /* white text box */
-      color: #000000;           /* black text inside the input */
+      background-color: #ffffff; 
+      color: #000000;           
     }
 
-    /* Suggestion button styles */
+    
     .suggestion-btn {
       margin-left: 5px;
       padding: 4px 8px;
       font-size: 0.9em;
       cursor: pointer;
-      background-color: #730f82; /* purple button */
-      color: #ffffff;            /* white text */
+      background-color: #730f82; 
+      color: #ffffff;            
       border: none;
       border-radius: 4px;
     }
@@ -87,8 +77,8 @@
       display: inline-block;
       margin: 3px;
       padding: 4px 8px;
-      background-color: #730f82; /* purple item */
-      color: #ffffff;            /* white text on purple */
+      background-color: #730f82; 
+      color: #ffffff;            
       border-radius: 4px;
       cursor: pointer;
     }
@@ -101,26 +91,26 @@
     .set-plans button {
       margin: 5px;
       padding: 8px 12px;
-      background-color: #730f82; /* purple button */
-      color: #ffffff;            /* white text */
+      background-color: #730f82; 
+      color: #ffffff;            
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
 
-    /* Generate button style */
+    
     #generateBtn {
       margin-top: 20px;
       padding: 12px 20px;
       font-size: 1.1em;
-      background-color: #730f82; /* purple button */
-      color: #ffffff;            /* white text */
+      background-color: #730f82; 
+      color: #ffffff;            
       border: none;
       border-radius: 6px;
       cursor: pointer;
     }
 
-    /* Loading spinner */
+    
     #loading {
       display: none;
       text-align: center;
@@ -130,7 +120,7 @@
     .spinner {
       margin: auto;
       border: 8px solid #f3f3f3;
-      border-top: 8px solid #730f82; /* purple spinner top */
+      border-top: 8px solid #730f82; 
       border-radius: 50%;
       width: 40px;
       height: 40px;
@@ -142,16 +132,16 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Right column heading */
+    
     .right h2 {
       text-align: center;
     }
 
-    /* Results area (output) => white box, black text */
+    
     #results {
       margin-top: 20px;
-      background: #ffffff;  /* white background */
-      color: #000000;       /* black text */
+      background: #ffffff;  
+      color: #000000;       
       padding: 15px;
       border-radius: 6px;
       min-height: 150px;
@@ -159,24 +149,24 @@
       overflow-y: auto;
     }
 
-    /* Styling for rendered markdown inside #results */
+    
     #results h1 {
       font-size: 2em;
       text-align: center;
       margin-bottom: 10px;
-      color: #730f82; /* headings in the results can be purple for emphasis */
+      color: #730f82; 
     }
 
     #results table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 10px;
-      background-color: #ffffff; /* keep table white */
-      color: #000000;           /* black text inside table */
+      background-color: #ffffff;
+      color: #000000;           
     }
 
     #results table, #results th, #results td {
-      border: 1px solid #000000; /* black border for cells */
+      border: 1px solid #000000;
     }
 
     #results th, #results td {
@@ -186,7 +176,7 @@
     }
 
     #results hr {
-      border: 1px solid #000000; /* black horizontal rule in results */
+      border: 1px solid #000000; 
       margin: 20px 0;
     }
   </style>
