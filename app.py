@@ -22,14 +22,13 @@ def index():
 def generate_recipes():
     data = request.json
     ingredients = data.get('ingredients', '')
-    dietary_preferences = data.get('dietary_preferences', '')  # Still using the same variable name, just changed label text
+    dietary_preferences = data.get('dietary_preferences', '') 
     caloric_target = data.get('caloric_target', '')
     health_conditions = data.get('health_conditions', '')
     meal_time = data.get('meal_time', 'No preference')
     cooking_experience = data.get('cooking_experience', 'No preference')
     quick_meals = data.get('quick_meals', False)
 
-    # Updated prompt to include "Dietary or Cuisine Preferences" and "Calories:"
     prompt = (
         "You are an AI recipe generator. Generate 3 distinct, detailed recipes based on these inputs: "
         f"Ingredients: {ingredients}; Dietary or Cuisine Preferences: {dietary_preferences}; Caloric Target: {caloric_target}; "
